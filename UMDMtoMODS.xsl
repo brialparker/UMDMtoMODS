@@ -17,33 +17,38 @@
     
      <xsl:template match="mediaType">
         <xsl:for-each select=".[@type]">
-            <mods:resourceType>
+            <mods:typeOfResource>
                 <xsl:if test="@type='sound'"><xsl:text>sound recording</xsl:text></xsl:if>
                 <xsl:if test="@type='movingImage'"><xsl:text>moving image</xsl:text></xsl:if>
+                <!-- how will we handle ones that are actually sound recordings, not moving images? -->
                 <xsl:if test="@type='text'"><xsl:text>text</xsl:text></xsl:if>
                 <xsl:if test="@type='image'"><xsl:text>still image</xsl:text></xsl:if>
                 <xsl:if test="@type='collection'"><xsl:attribute name="collection">yes</xsl:attribute><xsl:text>mixed material</xsl:text></xsl:if>
-            </mods:resourceType>
+            </mods:typeOfResource>
         </xsl:for-each>
+         
     </xsl:template> 
     
       <xsl:template match="title">
         <xsl:for-each select=".">   
             <xsl:choose>
-             <xsl:when test="@xml:Lang='ja'">
-                <mods:titleInfo xml:Lang="ja">
-                    <mods:title>
-                        <xsl:value-of select="."/>
-                    </mods:title>
-                </mods:titleInfo>
-            </xsl:when>
-            <!-- can't get xml:Lang="ja" to appear in titleInfo attribute?? -->
-            <xsl:when test="@xml:lang='ja-Latn'">
-                <mods:titleInfo type="translated" xml:Lang="ja-Latn">
-                    <mods:title>
-                        <xsl:value-of select="."/>
-                    </mods:title>
-                </mods:titleInfo>
+             <xsl:when test="@type='main'">
+                 <xsl:choose>
+                     <xsl:when test="@xml:lang='ja'">
+                            <mods:titleInfo xml:lang="ja">
+                                <mods:title>
+                                    <xsl:value-of select="."/>
+                                </mods:title>
+                            </mods:titleInfo>
+                        </xsl:when>
+                     <xsl:when test="@xml:lang='ja-Latn'">
+                         <mods:titleInfo type="translated" xml:Lang="ja-Latn">
+                             <mods:title>
+                                 <xsl:value-of select="."/>
+                             </mods:title>
+                         </mods:titleInfo>
+                     </xsl:when>
+                  </xsl:choose>            
             </xsl:when>
             <xsl:when test="@type='alternate'">
                 <mods:titleInfo type="alternative">
@@ -71,6 +76,9 @@
                        <xsl:attribute name="type">
                            <xsl:text>personal</xsl:text>
                        </xsl:attribute>
+                        <xsl:attribute name="xml:lang">
+                            <xsl:value-of select=".[@xml:lang]"/>
+                        </xsl:attribute>
                     <xsl:value-of select="persName"/>
                     </mods:name>
                 </xsl:when>
@@ -143,36 +151,44 @@
 
  <xsl:template match="physDesc">
      
-     <physicalDescription>
+     <mods:physicalDescription>
          <xsl:for-each select=".">
-        <extent>
+        <mods:extent>
             <xsl:call-template name="join">
                 <xsl:with-param name="list" select="extent | extent[@units/text()] | size | size[@units/text()]"/>
                 <xsl:with-param name="separator" select="', '" />
             </xsl:call-template>
-        </extent>
+        </mods:extent>
              <!-- cannot figure out how to get the extent and size units to appear at the moment -->
          </xsl:for-each>
          <xsl:for-each select="format">
-         <format>
+         <mods:format>
              <xsl:value-of select="."/>
-         </format>
+         </mods:format>
             
         </xsl:for-each>
-     </physicalDescription>
+     </mods:physicalDescription>
  </xsl:template>    
 
 <xsl:template match="description">
-    <xsl:for-each select=".[@type='summary']">
-        <abstract display-label="summary">
+    <xsl:choose>
+        <xsl:when test=".[@type='summary']">
+        <mods:abstract display-label="summary">
             <xsl:value-of select="."/>
-        </abstract>
-    </xsl:for-each>
-    <xsl:for-each select=".[@type='credits']">
-        <note type="creation/production credits">
+        </mods:abstract>
+    </xsl:when>
+    <xsl:when test=".[@type='credits']">
+        <mods:note type="creation/production credits">
             <xsl:value-of select="."/>
-        </note>
-    </xsl:for-each>
+        </mods:note>
+    </xsl:when>
+    <xsl:when test=".[@type='bibRef']">
+        <mods:note type="acquisition">
+            <xsl:value-of select="bibRef/imprint/availability/price"/>
+            <!-- how to keep "yen" as price unit and stay valid? -->
+        </mods:note>
+    </xsl:when>
+    </xsl:choose>
 </xsl:template>
 
 <xsl:template match="language">
@@ -285,6 +301,8 @@
             </xsl:choose>    
         </xsl:for-each>
     </xsl:template>
+
+        
     
     <xsl:template name="join">
         <xsl:param name="list" />
