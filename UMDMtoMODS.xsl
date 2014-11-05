@@ -26,6 +26,9 @@
                 <xsl:if test="@type='collection'"><xsl:attribute name="collection">yes</xsl:attribute><xsl:text>mixed material</xsl:text></xsl:if>
             </mods:typeOfResource>
         </xsl:for-each>
+         <mods:genre>
+             <xsl:value-of select="form"/>
+         </mods:genre>
          
     </xsl:template> 
     
@@ -188,6 +191,12 @@
             <!-- how to keep "yen" as price unit and stay valid? -->
         </mods:note>
     </xsl:when>
+    <xsl:when test=".[@label='pcbcensorship']">
+        <mods:note type="censorship">
+            <xsl:value-of select="."/>
+        </mods:note>
+    </xsl:when>
+      
     </xsl:choose>
 </xsl:template>
 
