@@ -79,9 +79,7 @@
                        <xsl:attribute name="type">
                            <xsl:text>personal</xsl:text>
                        </xsl:attribute>
-                        <xsl:attribute name="xml:lang">
-                            <xsl:value-of select=".[@xml:lang]"/>
-                        </xsl:attribute>
+                       <!-- how to copy over xml:lang attribute when it appears? -->
                     <xsl:value-of select="persName"/>
                     </mods:name>
                 </xsl:when>
@@ -288,26 +286,56 @@
                 <xsl:when test=".[@label='citation']">
                     <mods:relatedItem>
                         <mods:title>
-                            <xsl:value-of select="./bibref/title"/>
+                            <xsl:value-of select="./bibRef/title"/>
                         </mods:title>
-                        <!-- should be able to apply templates here for agent, geogname, etc., that appear in the citation -->
+                        <!-- should I be able to apply templates here for agent, geogname, etc., that appear in the citation? -->
                     </mods:relatedItem>
                 </xsl:when>
                 <xsl:when test=".[@label='archivalcollection']">
                     <mods:relatedItem>
                         <mods:title>
-                            <xsl:value-of select="./bibref/title"/>
+                            <xsl:value-of select="./bibRef/title"/>
                         </mods:title>
+                        <mods:location>
+                             <mods:holdingSimple>
+                                 <mods:copyInformation>
+                                     <mods:shelfLocator>
+                                 <xsl:for-each select="./bibRef/bibScope">
+                                     <xsl:if test=".[@type='series']">
+                                         <xsl:text>Series </xsl:text><xsl:value-of select="."/><xsl:text>, </xsl:text>
+                                     </xsl:if>
+                                         <xsl:if test=".[@type='subseries']">
+                                             <xsl:text>Subseries </xsl:text><xsl:value-of select="."/><xsl:text>, </xsl:text>
+                                         </xsl:if>   
+                                        <xsl:if test=".[@type='box']">
+                                 <xsl:text>Box </xsl:text><xsl:value-of select="."/><xsl:text>, </xsl:text>
+                                 </xsl:if>
+                                     <xsl:if test=".[@type='folder']">
+                                         <xsl:text>Folder </xsl:text><xsl:value-of select="."/><xsl:text>, </xsl:text>
+                                     </xsl:if>
+                                     <xsl:if test=".[@type='item']">
+                                         <xsl:text>Item </xsl:text><xsl:value-of select="."/><xsl:text>, </xsl:text>
+                                     </xsl:if>
+                                     <xsl:if test=".[@type='accession']">
+                                 <xsl:text>Accession </xsl:text><xsl:value-of select="."/>
+                                     </xsl:if>
+                                    </xsl:for-each>
+                                     </mods:shelfLocator>
+                                 </mods:copyInformation>
+                             </mods:holdingSimple>
+                            <!-- need to account for the rest of the bibScope info (such as collection, series, random numbers) and where it is/should go -->
+                        </mods:location>
                     </mods:relatedItem>
                 </xsl:when>
            <xsl:otherwise>
             <mods:relatedItem>
                 <mods:title>
-                    <xsl:value-of select="./bibref/title"/>
+                    <xsl:value-of select="./bibRef/title"/>
                 </mods:title>
             </mods:relatedItem>
            </xsl:otherwise>
-            </xsl:choose>    
+            </xsl:choose>
+           
         </xsl:for-each>
     </xsl:template>
 
