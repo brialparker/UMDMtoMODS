@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mods="http://www.loc.gov/mods/v3"
-    xmlns:dc="http://purl.org/dc/elements/1.1/" exclude-result-prefixes="xs" version="2.0">
+  exclude-result-prefixes="xs" version="2.0">
 
     <xsl:output method="xml" indent="yes"/>
-
-    <xsl:template match="doc/str">
-        <mods:mods xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    
+    <xsl:template match="/">
+        <mods:modsCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mods="http://www.loc.gov/mods/v3"
             xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-5.xsd">
             <xsl:apply-templates/>
-        </mods:mods>
+        </mods:modsCollection>
     </xsl:template>
 
-    <xsl:template match="descMeta">
+    <xsl:template match="collection/descMeta">
+        <mods:mods>
         <xsl:apply-templates select="title"/>
         <xsl:apply-templates select="agent[@type='creator']|agent[@type='contributor']"/>
         <xsl:apply-templates select="mediaType"/>
@@ -32,6 +33,7 @@
         <xsl:apply-templates select="identifier"/>
         <xsl:apply-templates select="repository"/>
         <xsl:apply-templates select="rights"/>
+        </mods:mods>
 
     </xsl:template>
 
@@ -279,7 +281,7 @@
     <xsl:template match="description">
         <xsl:choose>
             <xsl:when test=".[@type='summary']">
-                <mods:abstract display-label="summary">
+                <mods:abstract displayLabel="summary">
                     <xsl:value-of select="."/>
                 </mods:abstract>
             </xsl:when>
@@ -326,7 +328,7 @@
                     </xsl:attribute>
                 </xsl:if>
                 <xsl:if test="@label">
-                    <xsl:attribute name="label">
+                    <xsl:attribute name="displayLabel">
                         <xsl:copy>
                             <xsl:value-of select="./@label"/>
                         </xsl:copy>
@@ -397,7 +399,7 @@
                     <mods:subject>
                         <mods:hierarchicalGeographic>
                             <xsl:for-each select="./geogName">
-                                <xsl:element name="{@type}">
+                                <xsl:element name="mods:{@type}">
                                     <xsl:value-of select="."/>
                                 </xsl:element>
                             </xsl:for-each>
