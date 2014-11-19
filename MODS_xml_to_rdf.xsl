@@ -107,17 +107,21 @@ If there is a uniflorm title (there should be no more than one, though this is n
 ***********************************************************
 	
 -->
-<xsl:template match="mods:modsCollection/mods:mods">
+<xsl:template match="/">
 <!--   
         Root element:
  -->
 <rdf:RDF>
+<xsl:apply-templates/>
+</rdf:RDF>
+</xsl:template>
+
+<xsl:template match="mods:modsCollection/mods:mods">
 <xsl:comment>
 This RDF description created by the stylesheet at http://www.loc.gov/standards/mods/modsrdf/xsl-files/modsrdf.xsl
 </xsl:comment>
 <!--   -->
 <xsl:call-template name="modsRecordOrRelatedItem"/>
-</rdf:RDF>
 </xsl:template>
 <!--
  
