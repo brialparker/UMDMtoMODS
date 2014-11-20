@@ -175,8 +175,8 @@ This requires that an identifier of type 'modsIdentifier' has been added to the 
 </xsl:comment>
 <xsl:variable name="modsIdentifier">
 <xsl:choose>
-<xsl:when test="/mods:mods/mods:identifier[@type='modsIdentifier']">
-<xsl:value-of select="/mods:mods/mods:identifier[@type='modsIdentifier']"/>
+<xsl:when test="mods:identifier[@type='modsIdentifier']">
+<xsl:value-of select="mods:identifier[@type='modsIdentifier']"/>
 </xsl:when>
 <xsl:otherwise>
 <xsl:text>http://www.loc.gov/mods/rdf/v1#MODS123456</xsl:text>
