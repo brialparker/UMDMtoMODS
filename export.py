@@ -31,25 +31,24 @@ for action, elem in context:
 				pid = ET.SubElement(root, 'pid')
 				pid.text = child.text
 			elif child.tag=='str' and child.attrib['name'] == 'umdm':
-				descMeta = ET.SubElement(root, 'descMeta')
 				# the UMDM is encoded as text so decode and parse to XML and
-				# append the parsed XML as a child of the item
-				descMeta.append(ET.fromstring(child.text))
+				# append the parsed XML as a child of the root item
+				root.append(ET.fromstring(child.text))
 				
-		# write the item record to sts.stdout
+		# write the item record to sys.stdout
 		itemBytes = ET.tostring(itemTree)
 		if (itemBytes):
 			sys.stdout.write(itemBytes.decode("utf-8"))
 			sys.stdout.write('\n')
 					
-# cleanup
-# first empty children from current element
-# This is not absolutely necessary if you are also deleting siblings,
-# but it will allow you to free memory earlier.
+		# cleanup
+		# first empty children from current element
+		# This is not absolutely necessary if you are also deleting siblings,
+		# but it will allow you to free memory earlier.
 		elem.clear()
-    # second, delete previous siblings (records)
+		# second, delete previous siblings (records)
 		while elem.getprevious() is not None:
 			del elem.getparent()[0]
-    # make sure you have no references to Element objects outside the loop
+    		# make sure you have no references to Element objects outside the loop
 
 sys.stdout.write("</collection>\n")
