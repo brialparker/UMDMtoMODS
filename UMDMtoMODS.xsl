@@ -5,15 +5,25 @@
 
     <xsl:output method="xml" indent="yes"/>
     
-    <xsl:template match="/">
+    <xsl:template match="collection">
         <mods:modsCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mods="http://www.loc.gov/mods/v3"
             xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-5.xsd">
             <xsl:apply-templates/>
         </mods:modsCollection>
     </xsl:template>
 
-    <xsl:template match="collection/descMeta">
+    <xsl:template match="item">
         <mods:mods>
+            <xsl:apply-templates/>
+        </mods:mods>
+    </xsl:template>
+
+    <xsl:template match="pid">
+        <!-- because the MODS_xml_to_rdf.xsl expects the identifier to be type "modsIdentifier" in order to assign the URI of the resource -->
+        <mods:identifier type="modsIdentifier">http://fedora.lib.umd.edu/fedora/get/<xsl:value-of select="."/></mods:identifier>
+    </xsl:template>
+
+    <xsl:template match="descMeta">
         <xsl:apply-templates select="title"/>
         <xsl:apply-templates select="agent[@type='creator']|agent[@type='contributor']"/>
         <xsl:apply-templates select="mediaType"/>
@@ -33,8 +43,6 @@
         <xsl:apply-templates select="identifier"/>
         <xsl:apply-templates select="repository"/>
         <xsl:apply-templates select="rights"/>
-        </mods:mods>
-
     </xsl:template>
 
 

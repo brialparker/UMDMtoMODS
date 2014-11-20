@@ -12,7 +12,7 @@ June 7: When links are supplied in the mods xml record, either via XLink or auth
 
                                                          
 -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:modsrdf="http://www.loc.gov/mods/rdf/v1#" xmlns:madsrdf="http://www.loc.gov/mads/rdf/v1#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:identifier="http://id.loc.gov/vocabulary/identifier/" xmlns:relator="http://id.loc.gov/vocabulary/relator/" xmlns:note="http://id.loc.gov/vocabulary/note/" xmlns:abstract="http://id.loc.gov/vocabulary/abstract/" xmlns:access="http://id.loc.gov/vocabulary/access/" xmlns:class="http://id.loc.gov/vocabulary/class/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:ri="http://id.loc.gov/ontologies/RecordInfo#" xmlns:xlink="http://www.w3.org/1999/xlink" version="2.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:modsrdf="http://www.loc.gov/mods/rdf/v1#" xmlns="http://www.loc.gov/mods/rdf/v1#" xmlns:madsrdf="http://www.loc.gov/mads/rdf/v1#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:identifier="http://id.loc.gov/vocabulary/identifier/" xmlns:relator="http://id.loc.gov/vocabulary/relator/" xmlns:note="http://id.loc.gov/vocabulary/note/" xmlns:abstract="http://id.loc.gov/vocabulary/abstract/" xmlns:access="http://id.loc.gov/vocabulary/access/" xmlns:class="http://id.loc.gov/vocabulary/class/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:ri="http://id.loc.gov/ontologies/RecordInfo#" xmlns:xlink="http://www.w3.org/1999/xlink" version="2.0">
 <xsl:output method="xml" indent="yes"/>
 <!--
  
@@ -107,17 +107,21 @@ If there is a uniflorm title (there should be no more than one, though this is n
 ***********************************************************
 	
 -->
-<xsl:template match="mods:modsCollection/mods:mods">
+<xsl:template match="/">
 <!--   
         Root element:
  -->
 <rdf:RDF>
+<xsl:apply-templates/>
+</rdf:RDF>
+</xsl:template>
+
+<xsl:template match="mods:modsCollection/mods:mods">
 <xsl:comment>
 This RDF description created by the stylesheet at http://www.loc.gov/standards/mods/modsrdf/xsl-files/modsrdf.xsl
 </xsl:comment>
 <!--   -->
 <xsl:call-template name="modsRecordOrRelatedItem"/>
-</rdf:RDF>
 </xsl:template>
 <!--
  
@@ -171,8 +175,8 @@ This requires that an identifier of type 'modsIdentifier' has been added to the 
 </xsl:comment>
 <xsl:variable name="modsIdentifier">
 <xsl:choose>
-<xsl:when test="/mods:mods/mods:identifier[@type='modsIdentifier']">
-<xsl:value-of select="/mods:mods/mods:identifier[@type='modsIdentifier']"/>
+<xsl:when test="mods:identifier[@type='modsIdentifier']">
+<xsl:value-of select="mods:identifier[@type='modsIdentifier']"/>
 </xsl:when>
 <xsl:otherwise>
 <xsl:text>http://www.loc.gov/mods/rdf/v1#MODS123456</xsl:text>
