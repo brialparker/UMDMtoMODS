@@ -173,21 +173,11 @@ This requires that an identifier of type 'modsIdentifier' has been added to the 
 <xsl:comment>
 ******************************************************* Top level element *******************************************************
 </xsl:comment>
-<xsl:variable name="modsIdentifier">
-<xsl:choose>
-<xsl:when test="mods:identifier[@type='modsIdentifier']">
-<xsl:value-of select="mods:identifier[@type='modsIdentifier']"/>
-</xsl:when>
-<xsl:otherwise>
-<xsl:text>http://www.loc.gov/mods/rdf/v1#MODS123456</xsl:text>
-</xsl:otherwise>
-</xsl:choose>
-</xsl:variable>
 <xsl:element name="modsrdf:ModsResource">
-<xsl:attribute name="rdf:about">
-<xsl:value-of select="$modsIdentifier"/>
-</xsl:attribute>
-<xsl:value-of select="$newline"/>
+    <xsl:if test="mods:identifier[@type='modsIdentifier']">
+        <xsl:attribute name="rdf:about" select="mods:identifier[@type='modsIdentifier']"/>
+    </xsl:if>
+    <xsl:value-of select="$newline"/>
 <!--
  
 ***********************************************************************************
