@@ -743,7 +743,7 @@ Process roles.
 <xsl:choose>
 <xsl:when test="exists($relatorsList[. = $role])">
 <xsl:element name="{concat('relator:', $role)}">
-<xsl:attribute name="rdf:resource" select="$nameIdentifier"/>
+<xsl:attribute name="rdf:nodeID" select="$nameIdentifier"/>
 </xsl:element>
 </xsl:when>
 <xsl:otherwise>
@@ -753,7 +753,7 @@ Process roles.
 <xsl:value-of select="."/>
 </modsrdf:roleRelationshipRole>
 <xsl:element name="modsrdf:roleRelationshipName">
-<xsl:attribute name="rdf:resource" select="$nameIdentifier"/>
+<xsl:attribute name="rdf:nodeID" select="$nameIdentifier"/>
 </xsl:element>
 </modsrdf:RoleRelationship>
 </modsrdf:roleRelationship>
@@ -809,7 +809,7 @@ rdf name element: personalName, corporateName, etc.
 <!--   -->
 <xsl:element name="{concat($NameType, 'Name')}" namespace="http://www.loc.gov/mads/rdf/v1#">
 <xsl:if test="$about='yes'">
-<xsl:attribute name="rdf:about" select="$nameId"/>
+<xsl:attribute name="rdf:nodeID" select="$nameId"/>
 </xsl:if>
 <!--   
  -->
@@ -1770,7 +1770,7 @@ Get the principal name type  (e.g. "personal")
 </xsl:variable>
 <!--   -->
 <xsl:element name="{concat(upper-case(substring( $principalNameType , 1, 1) ), substring( $principalNameType , 2 ), 'Name' )}" namespace="http://www.loc.gov/mads/rdf/v1#">
-<xsl:attribute name="rdf:about" select="$principalNameIdentifier"/>
+<xsl:attribute name="rdf:nodeID" select="$principalNameIdentifier"/>
 </xsl:element>
 <xsl:call-template name="titlePreliminarySubTemplate"/>
 <xsl:value-of select="$newline"/>
