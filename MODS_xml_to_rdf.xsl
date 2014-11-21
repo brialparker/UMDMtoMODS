@@ -549,7 +549,7 @@ If type="code" a URI is generated; if not, text.
 <xsl:comment>*******language</xsl:comment>
 <xsl:value-of select="$newline"/>
 <xsl:for-each select="mods:languageTerm">
-<xsl:element name="LanguageOfResource" namespace="http://www.loc.gov/mods/rdf/v1#">
+<xsl:element name="languageOfResource" namespace="http://www.loc.gov/mods/rdf/v1#">
 <xsl:choose>
 <xsl:when test="@type='code' or @authority">
 <xsl:attribute name="rdf:resource" select="concat('http://id.loc.gov/vocabulary/language#',.)"/>
