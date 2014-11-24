@@ -588,6 +588,7 @@
 
     <xsl:template match="culture"/>
     <xsl:template match="century"/>
+    <xsl:template match="physDesc/size[@units='papersize']"/>
 
     <xsl:template name="join">
         <xsl:param name="list"/>
