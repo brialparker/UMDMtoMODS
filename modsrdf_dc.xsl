@@ -16,6 +16,13 @@
       <xsl:apply-templates select="@*|node()"/>
     </modsrdf:titlePrincipal>
   </xsl:template>
+
+  <xsl:template match="modsrdf:abstract">
+    <dc:description><xsl:value-of select="."/></dc:description>
+    <modsrdf:abstract>
+      <xsl:apply-templates select="@*|node()"/>
+    </modsrdf:abstract>
+  </xsl:template>
   
   <xsl:template match="@*|node()">
     <xsl:copy>
