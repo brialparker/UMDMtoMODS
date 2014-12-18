@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# strip out all blank nodes from an RDF file in Turtle syntax
+# then rewrite it out as Turtle with the DC and MODS RDF prefixes
+
+TURTLE=$1
+
+rapper -q -i ntriples -o turtle \
+    -f 'xmlns:dc="http://purl.org/dc/elements/1.1/"' \
+    -f 'xmlns:modsrdf="http://www.loc.gov/mods/rdf/v1#"' \
+    <(rapper -q -i turtle -o ntriples "$TURTLE" | grep -v '_:')
