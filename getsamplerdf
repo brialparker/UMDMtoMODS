@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# defaults
+ROWS=10
+QUERY='*:*'
+
+while getopts r:q: opt; do
+    case $opt in
+        r)
+            ROWS=$OPTARG
+            ;;
+        q)
+            QUERY=$OPTARG
+            ;;
+    esac
+done
+
+function xslt2proc {
+    XSL=$1
+    XML=$2
+    java net.sf.saxon.Transform -s:"$XML" -xsl:"$XSL"
+}
+
+python export.py 'https://solr.lib.umd.edu/solr/fedora/select' "$QUERY" "$ROWS" | xmllint --format - > umdm.xml
+
+xslt2proc UMDMtoMODS.xsl umdm.xml > mods.xml
+xslt2proc MODS_xml_to_rdf.xsl mods.xml > mods.rdf
+
+xsltproc modsrdf_dc.xsl mods.rdf > mods+dc.rdf 
+
+rapper -o ntriples mods+dc.rdf > mods+dc.n3
+rapper -o turtle mods+dc.rdf > mods+dc.ttl
+
+./rmbnodes mods+dc.ttl > mods+dc_noblanks.ttl
+
+#rapper -o dot mods+dc.rdf > mods+dc.dot
+#dot -Tpng -omods+dc.png mods+dc.dot

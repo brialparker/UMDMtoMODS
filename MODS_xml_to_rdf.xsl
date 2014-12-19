@@ -573,7 +573,7 @@ If type="code" a URI is generated; if not, text.
 <xsl:element name="Location" namespace="http://www.loc.gov/mods/rdf/v1#">
 <!--   -->
 <xsl:for-each select="mods:physicalLocation">
-<xsl:element name="locationPhysicalLocation" namespace="http://www.loc.gov/mods/rdf/v1#">
+<xsl:element name="locationPhysical" namespace="http://www.loc.gov/mods/rdf/v1#">
 <xsl:value-of select="."/>
 </xsl:element>
 </xsl:for-each>
@@ -593,7 +593,7 @@ If type="code" a URI is generated; if not, text.
 <xsl:if test="mods:holdingSimple">
 <xsl:for-each select="mods:holdingSimple/mods:copyInformation">
 <xsl:element name="locationCopy" namespace="http://www.loc.gov/mods/rdf/v1#">
-<xsl:element name="Copy" namespace="http://www.loc.gov/mods/rdf/v1#">
+<xsl:element name="LocationCopy" namespace="http://www.loc.gov/mods/rdf/v1#">
 <!--   -->
 <xsl:if test="mods:form">
 <xsl:element name="locationCopyForm" namespace="http://www.loc.gov/mods/rdf/v1#">
@@ -1016,7 +1016,7 @@ type other than statementOfResponsibility
 <xsl:with-param name="normal" select="@encoding"/>
 <xsl:with-param name="value" select="."/>
 <xsl:with-param name="namespace">http://www.loc.gov/mods/rdf/v1#</xsl:with-param>
-<xsl:with-param name="elementPrefix">resource</xsl:with-param>
+<xsl:with-param name="elementPrefix"></xsl:with-param>
 </xsl:call-template>
 </xsl:when>
 <xsl:otherwise>
@@ -1223,6 +1223,8 @@ remaining admin metadata elements
 <xsl:comment>**************relatedItem****************</xsl:comment>
 <!--   -->
 <xsl:variable name="Type">
+<!-- if there is no type, default to the generic relatedItem -->
+<xsl:if test="not(@type)">Item</xsl:if>
 <xsl:for-each select="@type">
 <xsl:if test=".!='simple'">
 <!--  avoid the stupid XLink simple attribute  -->
@@ -1240,7 +1242,7 @@ remaining admin metadata elements
 <xsl:text>Reference</xsl:text>
 </xsl:when>
 <xsl:when test=".='reviewOf'">
-<xsl:text>Rreview</xsl:text>
+<xsl:text>Review</xsl:text>
 </xsl:when>
 <xsl:otherwise>
 <xsl:value-of select="concat( upper-case( substring(. , 1 , 1) ) , substring(., 2 ) )"/>
@@ -1659,7 +1661,7 @@ Templates for MODS titleInfo element
 </xsl:element>
 </xsl:if>
 <xsl:value-of select="$newline"/>
-<xsl:element name="mainTitleElement" namespace="http://www.loc.gov/mads/rdf/v1#">
+<xsl:element name="MainTitleElement" namespace="http://www.loc.gov/mads/rdf/v1#">
 <xsl:element name="elementValue" namespace="http://www.loc.gov/mads/rdf/v1#">
 <xsl:value-of select="mods:title"/>
 </xsl:element>
@@ -1726,7 +1728,7 @@ Templates for MODS titleInfo element
 <xsl:text>hasAbbreviatedVariant</xsl:text>
 </xsl:when>
 <xsl:when test="@type='translated'">
-<xsl:text>hasTranslatedVariant</xsl:text>
+<xsl:text>hasTranslationVariant</xsl:text>
 </xsl:when>
 <xsl:when test="@type='alternative'">
 <xsl:text>hasVariant</xsl:text>
@@ -1867,8 +1869,18 @@ Auxiliary template for dates
 </xsl:otherwise>
 </xsl:choose>
 </xsl:variable>
+<xsl:variable name="MiddleElementName">
+    <xsl:choose>
+        <xsl:when test="$elementPrefix">
+            <xsl:value-of select="$middleElementName"/>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:value-of select="concat(lower-case(substring($middleElementName, 1, 1)), substring($middleElementName, 2))"/>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:variable>
 <!--   -->
-<xsl:element name="{concat($elementPrefix, $middleElementName,$Point)}" namespace="{$namespace}">
+<xsl:element name="{concat($elementPrefix, $MiddleElementName, $Point)}" namespace="{$namespace}">
 <xsl:attribute name="rdf:datatype">
 <xsl:choose>
 <xsl:when test="$normal='iso8601' or $normal='w3cdtf' or $normal='marc'">
