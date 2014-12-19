@@ -25,7 +25,40 @@
 
     <xsl:template match="descMeta">
         <xsl:apply-templates select="title"/>
+        <xsl:for-each select="agent[@type='creator'][persName/@xml:lang='ja']">
+            <xsl:variable name="pos" select="position()"/>
+            <mods:name type="personal" altRepGroup="{position()}">
+                <mods:namePart>
+                    <xsl:value-of select="persName"/>
+                </mods:namePart> 
+                <xsl:apply-templates select="." mode="roles"/>
+            </mods:name>
+            <mods:name altRepGroup="{position()}">
+                <mods:namePart>
+                    <xsl:value-of select="../agent[persName/@xml:lang='ja-Latn'][$pos]/persName"/>
+                </mods:namePart> 
+                <xsl:apply-templates select="." mode="roles"/>
+            </mods:name>
+        </xsl:for-each>
         <xsl:apply-templates select="agent[@type='creator']|agent[@type='contributor']"/>
+        <xsl:for-each select="agent[@type='provider']">
+            <xsl:if test="not(@role='publisher')">
+                <mods:name>
+                    <xsl:attribute name="type">
+                        <xsl:if test="persName">
+                            <xsl:text>personal</xsl:text>
+                        </xsl:if>
+                        <xsl:if test="corpName">
+                            <xsl:text>corporate</xsl:text>
+                        </xsl:if>
+                    </xsl:attribute>
+                    <mods:namePart>
+                        <xsl:value-of select="."/>
+                    </mods:namePart>
+                    <xsl:apply-templates select="." mode="roles"/>
+                </mods:name>
+            </xsl:if>
+        </xsl:for-each>
         <xsl:apply-templates select="mediaType"/>
         <xsl:apply-templates select="style"/>
         <mods:originInfo>
@@ -36,7 +69,6 @@
         </mods:originInfo>
         <xsl:apply-templates select="language"/>
         <xsl:apply-templates select="physDesc"/>
-
         <xsl:apply-templates select="description"/>
         <xsl:apply-templates select="subject"/>
         <xsl:apply-templates select="relationships/relation"/>
@@ -120,15 +152,11 @@
             </xsl:choose>
         </xsl:for-each>
     </xsl:template>
-
+      
     <xsl:template match="agent[@type='creator']|agent[@type='contributor']">
-        <xsl:for-each select=".[@type='creator']|.[@type='contributor']">
-            <xsl:choose>
-                <xsl:when test="persName">
-                    <mods:name>
-                        <xsl:attribute name="type">
-                            <xsl:text>personal</xsl:text>
-                        </xsl:attribute>
+        <xsl:choose>
+             <xsl:when test="persName[not(@xml:lang='ja'or @xml:lang='ja-Latn')]">
+                <mods:name type="personal">
                         <xsl:if test="persName[@xml:lang]">
                             <xsl:attribute name="xml:lang">
                                 <xsl:copy>
@@ -139,34 +167,7 @@
                         <mods:namePart>
                             <xsl:value-of select="persName"/>
                         </mods:namePart>
-
-                        <!-- one problem I see here is that in the Prange collection, the ja and ja-Latn forms of author names are not linked in any way. Ideally we would be able to group them under a single mods:name with
-                a <mods:namepart xml:lang="ja"> and a <mods:namepart xml:lang="ja-Latn">. For now a new mods:name element will appear for each version, even if it is the same person -->
-
-                        <xsl:if test=".[@role='illustrator']">
-                            <mods:role>
-                                <mods:roleTerm type="text">Illustrator</mods:roleTerm>
-                                <mods:roleTerm type="code">ill</mods:roleTerm>
-                            </mods:role>
-                        </xsl:if>
-                        <xsl:if test=".[@role='author']">
-                            <mods:role>
-                                <mods:roleTerm type="text">Author</mods:roleTerm>
-                                <mods:roleTerm type="code">aut</mods:roleTerm>
-                            </mods:role>
-                        </xsl:if>
-                        <xsl:if test=".[@role='editor']">
-                            <mods:role>
-                                <mods:roleTerm type="text">Editor</mods:roleTerm>
-                                <mods:roleTerm type="code">edt</mods:roleTerm>
-                            </mods:role>
-                        </xsl:if>
-                        <xsl:if test=".[@role='publisher']">
-                            <mods:role>
-                                <mods:roleTerm type="text">Publisher</mods:roleTerm>
-                                <mods:roleTerm type="code">pbl</mods:roleTerm>
-                            </mods:role>
-                        </xsl:if>
+                    <xsl:apply-templates select="." mode="roles"/>
                     </mods:name>
                 </xsl:when>
                 <xsl:when test="corpName">
@@ -177,14 +178,13 @@
                         <mods:namePart>
                             <xsl:value-of select="corpName"/>
                         </mods:namePart>
+                        <xsl:apply-templates select="." mode="roles"/>
                     </mods:name>
                 </xsl:when>
             </xsl:choose>
-        </xsl:for-each>
     </xsl:template>
 
-    <xsl:template match="agent[@role='publisher']">
-        <xsl:for-each select=".">
+ <xsl:template match="agent[@role='publisher']">
         <mods:publisher>
             <xsl:if test="corpName[@xml:lang]">
                 <xsl:attribute name="xml:lang">
@@ -195,7 +195,39 @@
             </xsl:if>
             <xsl:value-of select="corpName"/>
         </mods:publisher>
-        </xsl:for-each>
+    </xsl:template> 
+    
+    <xsl:template match="agent" mode="roles">
+        <xsl:if test="@role='illustrator'">
+            <mods:role>
+                <mods:roleTerm type="text">Illustrator</mods:roleTerm>
+                <mods:roleTerm type="code">ill</mods:roleTerm>
+            </mods:role>
+        </xsl:if>
+        <xsl:if test="@role='author'">
+            <mods:role>
+                <mods:roleTerm type="text">Author</mods:roleTerm>
+                <mods:roleTerm type="code">aut</mods:roleTerm>
+            </mods:role>
+        </xsl:if>
+        <xsl:if test="@role='editor'">
+            <mods:role>
+                <mods:roleTerm type="text">Editor</mods:roleTerm>
+                <mods:roleTerm type="code">edt</mods:roleTerm>
+            </mods:role>
+        </xsl:if>
+        <xsl:if test="@role='publisher'">
+            <mods:role>
+                <mods:roleTerm type="text">Publisher</mods:roleTerm>
+                <mods:roleTerm type="code">pbl</mods:roleTerm>
+            </mods:role>
+        </xsl:if>
+        <xsl:if test="@type='provider'">
+            <mods:role>
+                <mods:roleTerm type="text">Provider</mods:roleTerm>
+                <mods:roleTerm type="code">prv</mods:roleTerm>
+            </mods:role>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="covTime/date | subject[@type='temporal']/date">
@@ -588,7 +620,6 @@
 
     <xsl:template match="culture"/>
     <xsl:template match="century"/>
-    <xsl:template match="physDesc/size[@units='papersize']"/>
 
     <xsl:template name="join">
         <xsl:param name="list"/>
